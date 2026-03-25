@@ -1,0 +1,126 @@
+{
+  "1": {
+    "inputs": {
+      "image": "bc9ffe6aec354c26b96a8e605ee03ada.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "2": {
+    "inputs": {
+      "apply_noise_o": true,
+      "noise_std_frac": 0.02,
+      "apply_clahe_o": false,
+      "clahe_clip": 1,
+      "clahe_grid": 8,
+      "fourier_cutoff": 0.25,
+      "apply_fourier_o": true,
+      "fourier_strength": 0.7,
+      "fourier_randomness": 0.03,
+      "fourier_phase_perturb": 0.05,
+      "fourier_radial_smooth": 5,
+      "fourier_mode": "ref",
+      "fourier_alpha": 1,
+      "perturb_mag_frac": 0.002,
+      "enable_awb": false,
+      "enable_lut": false,
+      "lut": "X://insert/path/here(.png/.npy/.cube)",
+      "lut_strength": 1,
+      "glcm": false,
+      "glcm_distances": "1",
+      "glcm_angles": "0,0.7853981633974483,1.5707963267948966,2.356194490192345",
+      "glcm_levels": 256,
+      "glcm_strength": 0.9,
+      "lbp": false,
+      "lbp_radius": 3,
+      "lbp_n_points": 24,
+      "lbp_method": "uniform",
+      "lbp_strength": 0.9,
+      "seed": 1358385268,
+      "apply_exif_o": true,
+      "image": [
+        "1",
+        0
+      ],
+      "Cam_Opt": [
+        "3",
+        0
+      ],
+      "NS_Opt": [
+        "4",
+        0
+      ]
+    },
+    "class_type": "NovaNodes",
+    "_meta": {
+      "title": "Image Postprocess (NOVA NODES)"
+    }
+  },
+  "3": {
+    "inputs": {
+      "enable_bayer": true,
+      "apply_jpeg_cycles_o": true,
+      "jpeg_cycles": 2,
+      "jpeg_quality": 80,
+      "jpeg_qmax": 90,
+      "apply_vignette_o": false,
+      "vignette_strength": 0,
+      "apply_chromatic_aberration_o": false,
+      "ca_shift": 1.2,
+      "iso_scale": 1,
+      "read_noise": 0.5,
+      "hot_pixel_prob": 1e-7,
+      "apply_banding_o": false,
+      "banding_strength": 0,
+      "apply_motion_blur_o": true,
+      "motion_blur_ksize": 1
+    },
+    "class_type": "CameraOptionsNode",
+    "_meta": {
+      "title": "Camera Options (NOVA)"
+    }
+  },
+  "4": {
+    "inputs": {
+      "non_semantic": true,
+      "ns_iterations": 500,
+      "ns_learning_rate": 0.0002,
+      "ns_t_lpips": 0.04,
+      "ns_t_l2": 0.00003,
+      "ns_c_lpips": 0.01,
+      "ns_c_l2": 0.6,
+      "ns_grad_clip": 0.05
+    },
+    "class_type": "NSOptionsNode",
+    "_meta": {
+      "title": "Non-semantic Options (NOVA)"
+    }
+  },
+  "5": {
+    "inputs": {
+      "images": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "8": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}

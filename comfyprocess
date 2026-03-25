@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# comfyprocess - Process images through ComfyUI from anywhere
+# Usage:
+#   comfyprocess photo.png                        # file
+#   comfyprocess https://example.com/image.png    # url
+#   echo "<base64>" | comfyprocess --base64       # base64 from stdin
+
+SERVER="http://localhost:3169/process"
+OUTPUT_DIR="$(pwd)"
+
+usage() {
+    echo "Usage:"
+    echo "  comfyprocess <image-file>              Process a local image file"
+    echo "  comfyprocess <image-url>               Process an image from URL"
+    echo "  comfyprocess --base64 <base64-string>  Process a base64-encoded image"
+    echo "  echo '<b64>' | comfyprocess --base64   Read base64 from stdin"
+    echo ""
+    echo "Output is saved as output.png in the current directory."
+    exit 1
+}
+
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+# Base64 mode
+if [ "$1" = "--base64" ]; then
+    if [ -n "$2" ]; then
+        B64="$2"
+    else
+        B64=$(cat)
+    fi
+    RESPONSE=$(curl -s -X POST "$SERVER" \
+        -H "Content-Type: application/json" \
+        -d "{\"base64\": \"$B64\"}")
+# URL mode
+elif [[ "$1" =~ ^https?:// ]]; then
+    RESPONSE=$(curl -s -X POST "$SERVER" \
+        -H "Content-Type: application/json" \
+        -d "{\"url\": \"$1\"}")
+# File mode
+elif [ -f "$1" ]; then
+    RESPONSE=$(curl -s -X POST -F "image=@$1" "$SERVER")
+else
+    echo "Error: '$1' is not a valid file or URL"
+    exit 1
+fi
+
+# Check response
+STATUS=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
+
+if [ "$STATUS" = "success" ]; then
+    # Copy output from server directory to current directory
+    SERVER_OUTPUT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['output'])" 2>/dev/null)
+    cp "$SERVER_OUTPUT" "$OUTPUT_DIR/output.png"
+    echo "Done! Saved to $OUTPUT_DIR/output.png"
+else
+    ERROR=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('error','Unknown error'))" 2>/dev/null)
+    echo "Error: $ERROR"
+    exit 1
+fi
